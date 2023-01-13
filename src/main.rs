@@ -23,6 +23,7 @@ fn write_welcome(term : &mut terminal::Terminal<Stdout>)
 enum Input {
 	ESC,
 	INTRO,
+	BACKSPACE,
 	CHAR(char),
 }
 #[allow(unreachable_code)]
@@ -35,6 +36,8 @@ fn read_input_key(term : &mut terminal::Terminal<Stdout>) -> Input
 				return Input::ESC,
 			Retrieved::Event(Some(Event::Key(KeyEvent{code: KeyCode::Enter, ..}))) =>
 				return Input::INTRO,
+			Retrieved::Event(Some(Event::Key(KeyEvent{code: KeyCode::Backspace, ..}))) =>
+				return Input::BACKSPACE,
 			Retrieved::Event(Some(Event::Key(KeyEvent{code: KeyCode::Char(c), ..}))) => {
 				match c {
 					'0'..='9' => return Input::CHAR(c),
@@ -77,6 +80,19 @@ fn get_user_input(term: &mut terminal::Terminal<Stdout>) -> UserInput{
 	loop {
 		match read_input_key(term) {
 			Input::ESC => return UserInput::STOP,
+			Input::BACKSPACE => {
+				if input_str.len() > 0 {
+					input_str.pop();
+					match term.get(Value::CursorPosition){
+						Ok(Retrieved::CursorPosition(x, y)) => {
+							term.act(Action::MoveCursorTo(x - 1, y)).unwrap();
+							term.write(b" ").unwrap();
+							term.act(Action::MoveCursorTo(x - 1, y)).unwrap();
+						}
+						_ => {}
+					}
+				}
+			}
 			Input::CHAR(c) => {
 				term.write_all(&[c as u8]).unwrap();
 				term.flush_batch().unwrap();

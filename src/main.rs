@@ -99,6 +99,8 @@ fn get_user_input(term: &mut terminal::Terminal<Stdout>) -> UserInput{
 				input_str.push(c);
 			}
 			Input::INTRO => {
+				if input_str.is_empty() {continue;}
+
 				let user_input : u16 = input_str.parse().unwrap();
 				return UserInput::VALUE(user_input);
 			},

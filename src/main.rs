@@ -1,4 +1,4 @@
-use rand;
+use rand::{self, Rng};
 use std::{io::{Write, Stdout}};
 use terminal::{Clear, Action, Attribute, Value, Retrieved, KeyEvent, Event, KeyCode, Color};
 
@@ -54,8 +54,8 @@ struct Problem{
 
 fn generate_problem() -> Problem {
 	Problem{
-		a : rand::random::<u16>() % 10,
-		b : rand::random::<u16>() % 10,
+		a : rand::thread_rng().gen_range(0..=9),
+		b : rand::thread_rng().gen_range(0..=9),
 	}
 }
 
